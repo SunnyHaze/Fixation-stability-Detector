@@ -1,0 +1,14 @@
+{
+    "MONITOR": [
+        1080,
+        768
+    ],
+    "distanceOfSubject": 30,
+    "angleRange": [
+        6,
+        12
+    ],
+    "pixelPerCM": 49.4,
+    "BlackCrossDiameter": 4.3,
+    "blackPointDiameterAngle" : 0.5
+}
