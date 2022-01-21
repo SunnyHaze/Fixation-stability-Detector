@@ -3,18 +3,10 @@ from encodings import utf_8
 import json
 from multiprocessing.connection import wait
 import sys
-from turtle import width
 import pygame
 import random
 
-from scipy import rand
 # 导入配置文件
-
-def cross(surface,color,location,size):
-    scaleRate = 0.1
-    barWidth = scaleRate * size
-    pygame.draw.rect(surface,color,(location[0]-barWidth/2,location[1]-size/2,barWidth,size),0)
-    pygame.draw.rect(surface,color,(location[0]-size/2,location[1]-barWidth/2,size,barWidth),0)
 with open("config.json","r",encoding="utf-8") as f:
     str = f.read()
     settings = json.loads(str)
@@ -34,12 +26,19 @@ with open("config.json","r",encoding="utf-8") as f:
     blackPointDiameterAngle = settings["blackPointDiameterAngle"]
 
 # 利用给定的参数实现视角到像素的转换
-def angle2Pixel(angle):
+def angle2Pixel(angle): # 利用三角函数实现角度到长度的映射
     return tan(angle * 2 * pi / 360) * distanceOfSubject * pixelPerCM
+
+# 绘制中央黑十字
+def cross(surface,color,location,size):
+    scaleRate = 0.1
+    barWidth = scaleRate * size
+    pygame.draw.rect(surface,color,(location[0]-barWidth/2,location[1]-size/2,barWidth,size),0)
+    pygame.draw.rect(surface,color,(location[0]-size/2,location[1]-barWidth/2,size,barWidth),0)
 
 blackPointWidth = int(angle2Pixel(blackPointDiameterAngle)) # 计算黑点直径
 # 绘制中央黑点
-def drawCenterPoint(surface):
+def drawCenterPoint(surface): #
     pygame.draw.circle(surface,(0,0,0),(WIDTH/2,HEIGHT/2),blackPointWidth/2)
 
 # 绘制干扰点
@@ -57,8 +56,9 @@ def drawDistract(surface):
     dx = ranLength * cos(ranAngle) + starCorrection[0]
     dy = ranLength * sin(ranAngle) + starCorrection[1]
     starLocation =  WIDTH/2 + dx, HEIGHT/2 + dy
-    surface.blit(star,starLocation)
-          
+    surface.blit(star,starLocation) # 绘制
+
+# 按时间序列生成一系列10个混淆点    
 def DistractVision(surface):
     timeArray = [random.random()*5 for i in range(20)]
     timeArray.sort()
@@ -73,6 +73,7 @@ def DistractVision(surface):
         drawCenterPoint(surface)
         pygame.display.flip()
         endTime = i[1]
+
 # 管理整个15000s流程
 def theWholeProcess(surface):
     # 先展示5秒十字
@@ -87,8 +88,10 @@ def theWholeProcess(surface):
     # 展示混淆
     DistractVision(surface)
     pygame.time.wait(5000)
+    pygame.quit()
     exit(0)
-# 初始化
+
+# 初始化Pygame
 pygame.init()
 # 设置主屏幕
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -98,13 +101,9 @@ pygame.display.set_caption("欢迎来到本测试")
 
 clock = pygame.time.Clock()
 while True:
-    clock.tick(60)
-
+    clock.tick(60) # 设置刷新率，不过没什么用
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-    # pygame.draw.circle(screen, (0,0,0), (WIDTH/2, HEIGHT/2), pixelPerCM * blackCircleDiameter / 2, width=0)        
-    
-    # cross(screen,(0,0,0),(WIDTH/2, HEIGHT/2), pixelPerCM * blackCrossDiameter)
-    theWholeProcess(screen) 
-pygame.quit()
+    theWholeProcess(screen)  # 执行全渲染流程即可，完事儿后退出
+
